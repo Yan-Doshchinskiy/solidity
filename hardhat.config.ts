@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
@@ -9,34 +9,56 @@ import "solidity-coverage";
 
 dotenv.config();
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+const url = process.env.CHAIN_URL as string;
+const privateKey = process.env.PRIVATE_KEY as string;
+const chainId = Number(process.env.CHAIN_ID as string) || 0;
+const reportGas = (process.env.REPORT_GAS as string) === "true";
+const apiKey = process.env.API_KEY as string;
 
-  for (const account of accounts) {
-    console.log(account.address);
+const requiredEnvs = [
+  { value: url, key: "CHAIN_URL" },
+  { value: privateKey, key: "PRIVATE_KEY" },
+  { value: chainId, key: "CHAIN_ID" },
+  { value: apiKey, key: "API_KEY" },
+];
+
+requiredEnvs.forEach((item) => {
+  if (!item.value) {
+    throw new Error(
+      `Please check that the ${item.key} value exist in the .env file`
+    );
   }
 });
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  solidity: {
+    version: "0.8.4",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    kovan: {
+      url,
+      accounts: privateKey ? [privateKey] : [],
+      chainId: chainId,
     },
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    enabled: reportGas,
     currency: "USD",
   },
+  paths: {
+    artifacts: "./artifacts",
+    cache: "./cache",
+    sources: "./contracts",
+    tests: "./test",
+  },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: apiKey,
   },
 };
 
