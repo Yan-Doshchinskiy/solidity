@@ -1,5 +1,4 @@
 // eslint-disable-next-line node/no-missing-import
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/src/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 

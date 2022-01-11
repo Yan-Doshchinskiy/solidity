@@ -17,7 +17,7 @@ contract Donation {
     }
 
     function withdraw(address payable recipient, uint256 amount) external _ownerOnly {
-//        require(amount <= this.getBalance(), "amount exceeds Donation contract balance");
+        require(amount <= this.getBalance(), "amount exceeds Donation contract balance");
         recipient.transfer(amount);
     }
 
