@@ -1,8 +1,7 @@
 // eslint-disable-next-line node/no-missing-import
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/src/signers";
-
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import { ethers } from "hardhat";
 
 describe("Donation testing", async function () {
   const testAmount = 500;
@@ -23,9 +22,9 @@ describe("Donation testing", async function () {
     const Factory = await ethers.getContractFactory("Donation");
     const contract = await Factory.deploy();
     const ownerAddress = await contract.getOwner();
-    const signers: Array<SignerWithAddress> = await ethers.getSigners();
+    const signers = await ethers.getSigners();
     const testAddress = signers.find(
-      (signer: SignerWithAddress) => signer.address !== ownerAddress
+      (signer) => signer.address !== ownerAddress
     );
     const initialAmount = await contract.getTotalAmount();
     expect(initialAmount).to.equal(0);
@@ -40,9 +39,9 @@ describe("Donation testing", async function () {
     const Factory = await ethers.getContractFactory("Donation");
     const contract = await Factory.deploy();
     const ownerAddress = await contract.getOwner();
-    const signers: Array<SignerWithAddress> = await ethers.getSigners();
+    const signers = await ethers.getSigners();
     const testAddress = signers.find(
-      (signer: SignerWithAddress) => signer.address !== ownerAddress
+      (signer) => signer.address !== ownerAddress
     );
     const sponsors = await contract.getSponsors();
     expect(sponsors.length).to.equal(0);
@@ -58,15 +57,16 @@ describe("Donation testing", async function () {
     const Factory = await ethers.getContractFactory("Donation");
     const contract = await Factory.deploy();
     const ownerAddress = await contract.getOwner();
-    const signers: Array<SignerWithAddress> = await ethers.getSigners();
+    const signers = await ethers.getSigners();
     const testAddress = signers.find(
-      (signer: SignerWithAddress) => signer.address !== ownerAddress
+      (signer) => signer.address !== ownerAddress
     );
     await testAddress?.sendTransaction({
       to: contract.address,
       value: testAmount,
     });
     await expect(
+      // @ts-ignore
       contract.connect(testAddress).withdraw(testWithdrawAddress, testAmount)
     ).to.be.revertedWith("only owner can do this");
   });
@@ -74,10 +74,8 @@ describe("Donation testing", async function () {
     const Factory = await ethers.getContractFactory("Donation");
     const contract = await Factory.deploy();
     const ownerAddress = await contract.getOwner();
-    const signers: Array<SignerWithAddress> = await ethers.getSigners();
-    const owner = signers.find(
-      (signer: SignerWithAddress) => signer.address === ownerAddress
-    );
+    const signers = await ethers.getSigners();
+    const owner = signers.find((signer) => signer.address === ownerAddress);
     await owner?.sendTransaction({
       to: contract.address,
       value: testAmount,
